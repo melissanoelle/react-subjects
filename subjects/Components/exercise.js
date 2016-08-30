@@ -45,7 +45,7 @@ class Tab extends React.Component {
     let tabStyle
     this.props.name === this.props.active ? tabStyle = styles.activeTab : tabStyle = styles.tab
     return (
-      <div className="Tab" style={tabStyle} data-name={this.props.name} onClick={this.props.onClick}>
+      <div className="Tab" data-index={this.props.index} style={tabStyle} onClick={this.props.onClick}>
         {this.props.name}
       </div>
     )
@@ -56,30 +56,33 @@ class App extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      activeTab: 'USA'
+      activeId: 0
     }
     this.handleTabClick = this.handleTabClick.bind(this)
     this.getDescription = this.getDescription.bind(this)
   }
 
   handleTabClick (e) {
-    window.hi = e.target
-    this.setState({activeTab: e.target.dataset.name})
+    this.setState({activeId: e.target.dataset.index})
   }
 
-  getDescription (stuff) {
-    return stuff.map((thing) => { if (thing.name === this.state.activeTab) return thing.description })
+  getDescription (id = this.state.activeId) {
+    return DATA[id].description
+  }
+
+  getName (id = this.state.activeId) {
+    return DATA[id].name
   }
 
   render () {
-    let isActive = true
-    let tabs = this.props.countries.map((country) => {
+    let tabs = this.props.countries.map((country, index) => {
       return ( <Tab 
-        key={country.id} 
-        name={country.name} 
-        active={this.state.activeTab} 
-        onClick={this.handleTabClick} /> )
-      isActive = false
+        key={index} 
+        index={index}
+        name={this.getName(index)} 
+        active={this.getName()} 
+        onClick={this.handleTabClick} /> 
+      )
     })
     return (
       <div>
@@ -88,7 +91,7 @@ class App extends React.Component {
           {tabs}
         </div>
         <div className="TabPanel" style={styles.panel}>
-          {this.getDescription(this.props.countries)}
+          {this.getDescription()}
         </div>
       </div>
     )
