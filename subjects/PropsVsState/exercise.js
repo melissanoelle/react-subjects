@@ -20,45 +20,30 @@ import { render } from 'react-dom'
 import * as styles from './lib/styles'
 import data from './lib/data'
 
-const Tabs = React.createClass({
-
-  propTypes: {
-    data: React.PropTypes.array.isRequired
-  },
-
-  getInitialState() {
-    return {
-      activeTabIndex: 0
-    }
-  },
-
-  handleTabClick(activeTabIndex) {
-    this.setState({ activeTabIndex })
-  },
-
+class Tabs extends React.Component {
   renderTabs() {
     return this.props.data.map((tab, index) => {
-      const style = this.state.activeTabIndex === index ?
+      const style = this.props.activeTabId === index ?
         styles.activeTab : styles.tab
       return (
         <div
           className="Tab"
           key={tab.name}
           style={style}
-          onClick={() => this.handleTabClick(index)}
+          onClick={() => this.props.onClick(index)}
         >{tab.name}</div>
       )
     })
-  },
+  }
 
   renderPanel() {
-    const tab = this.props.data[this.state.activeTabIndex]
+    const tab = this.props.data[this.props.activeTabId]
     return (
       <div>
         <p>{tab.description}</p>
       </div>
     )
-  },
+  }
 
   render() {
     return (
@@ -72,21 +57,37 @@ const Tabs = React.createClass({
       </div>
     )
   }
+}
+Tabs.propTypes = {
+  data: React.PropTypes.array.isRequired,
+  onClick: React.PropTypes.func.isRequired
+}
 
-})
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      activeTabId: 0
+    }
+    this.handleTabClick = this.handleTabClick.bind(this)
+  }
 
-const App = React.createClass({
+  handleTabClick (activeTabId) {
+    this.setState({ activeTabId })
+  }
 
   render() {
     return (
       <div>
         <h1>Props v. State</h1>
-        <Tabs ref="tabs" data={this.props.tabs}/>
+        <Tabs ref="tabs" data={this.props.tabs} activeTabId={this.state.activeTabId} onClick={this.handleTabClick} />
       </div>
     )
   }
-
-})
+}
+App.propTypes = {
+  tabs: React.PropTypes.array.isRequired
+}
 
 render(<App tabs={data}/>, document.getElementById('app'), function () {
   require('./tests').run(this)
